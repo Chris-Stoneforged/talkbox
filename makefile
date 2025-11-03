@@ -12,7 +12,7 @@ debug: CFLAGS+=-g
 debug: $(EXE)
 
 $(EXE): $(OBJ)
-	$(CC) -o $@ $^
+	$(CC) -o build/$@ $^
 
 -include $(DEP)
 
