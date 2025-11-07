@@ -11,6 +11,11 @@ EXE=talkbox
 debug: CFLAGS+=-g
 debug: $(EXE)
 
+remake: clean debug
+
+clean:
+	rm -f $(OBJ) $(DEP) build/$(EXE)
+
 $(EXE): $(OBJ)
 	$(CC) -o build/$@ $^
 
