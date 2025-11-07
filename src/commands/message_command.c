@@ -3,11 +3,7 @@
 #include <unistd.h>
 #include "message_command.h"
 
-int validate_positional_arg(char *arg) {
-	return arg == NULL || *arg == '-' ? 1 : 0;
-}
-
-void handle_message_subcommand(int argc, char **argv) {
+void handle_message_command(int argc, char **argv) {
 	int a = 0, f;
 	argc -= 2;	// 2 Positional arguments required below, reduce argc to match
 	optind = 0;	// Set optind to 0 so it gets every arg after the last positional arg
