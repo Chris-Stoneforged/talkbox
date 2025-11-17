@@ -3,6 +3,7 @@
 #include "message_command.h"
 #include "start_server_command.h"
 #include "connect_command.h"
+#include "kill_server_command.h"
 #include "../parser/parser.h"
 
 void handle_commands(struct ParserResult *r, int argc, char **argv) {
@@ -14,6 +15,8 @@ void handle_commands(struct ParserResult *r, int argc, char **argv) {
 		handle_start_server_command(argc, argv);
 	else if (sub_equals("connect"))
 		handle_connect_command(argc, argv);
+	else if (sub_equals("kill-server"))
+		handle_kill_server_command(argc, argv);
 	else
 		printf("Nothing to do!\n");
 }
