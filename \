@@ -1,0 +1,21 @@
+#include <stdlib.h>
+#include "command_registry.h"
+#include "message_command.h"
+
+#define NUM_COMMANDS 1
+
+struct Command **get_registry() {
+	struct Command **registry = (struct Command **)malloc(sizeof(struct Command *) * NUM_COMMANDS);
+
+	registry[0] = get_message_command();
+
+	return registry;
+}
+
+void free_registry(struct Command **registry) {
+	struct Command ** r = registry;
+	while (*r++ != NULL)
+		free(*r);
+
+	free(registry);
+}
