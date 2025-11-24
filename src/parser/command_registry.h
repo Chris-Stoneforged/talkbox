@@ -3,7 +3,8 @@
 
 #include "subcommand.h"
 
-struct Command **get_registry(void);
-void free_registry(struct Command **registry);
+void setup_registry(void);
+struct Command *registry_get(char *cmd_name);
+void free_registry(void);
 
 #endif

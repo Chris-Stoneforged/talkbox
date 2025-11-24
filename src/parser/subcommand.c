@@ -2,46 +2,17 @@
 #include <stdio.h>
 #include "subcommand.h"
 
-int get_flag_value(struct Command *cmd, char c) {
-	for (struct Flag *f = cmd->flags; f != NULL; f = f->next) {
-		if (f->flag_char == c)
-			return f->val;
-	}
-
-	fprintf(stderr, "No flag exists with character %c\n", c);
-	return 0;
-}
-
-char *get_opt_value(struct Command *cmd, char c) {
-	for (struct Opt *o = cmd->opts; o != NULL; o = o->next) {
-		if (o->opt_char == c)
-			return o->val;
-	}
-
-	fprintf(stderr, "No opt exists with character %c\n", c);
-	return NULL;
-}
-
-char *get_arg_value(struct Command *cmd, int index) {
-	int c = 0;
-	for (struct Arg *a = cmd->args; a != NULL; a = a->next) {
-		if (c == index)
-			return a->val;
-		c++;
-	}
-
-	fprintf(stderr, "No arg exists at index %d\n", index);
-	return NULL;
-}
-
-struct Command *create_subcommand(char *name, char *desc) {
+struct Command *create_command(char *name, char *desc) {
 	struct Command *cmd = (struct Command *)malloc(sizeof(struct Command));
 	cmd->name = name;
 	cmd->desc = desc;
-	cmd->handler = NULL;
 	cmd->flags = NULL;
 	cmd->opts = NULL;
 	cmd->args = NULL;
+	cmd->handler = NULL;
+	cmd->num_flags = 0;
+	cmd->num_opts = 0;
+	cmd->num_args = 0;
 	return cmd;
 }
 
@@ -52,6 +23,7 @@ void add_opt(struct Command *cmd, char c, char *desc) {
 	new_opt->next = cmd->opts;
 
 	cmd->opts = new_opt;
+	cmd->num_opts++;
 }
 
 void add_flag(struct Command *cmd, char c, char *desc) {
@@ -61,6 +33,7 @@ void add_flag(struct Command *cmd, char c, char *desc) {
 	new_flag->next = cmd->flags; 
 
 	cmd->flags = new_flag;
+	cmd->num_flags++;
 }
 
 void add_arg(struct Command *cmd, char *desc) {
@@ -69,12 +42,49 @@ void add_arg(struct Command *cmd, char *desc) {
 	new_arg->next = cmd->args;
 
 	cmd->args = new_arg;
+	cmd->num_args++;
 }
 
-void set_handler(struct Command *cmd, void (*handler)(struct Command *cmd)) {
+void set_handler(struct Command *cmd, void(*handler)(struct ParseSubcommandResult *cmd_res)) {
+	if (cmd->handler != NULL) {
+		printf("%s command already has a handler assigned. Commands can only have one handler", cmd->name);
+		return;
+	}
+
 	cmd->handler = handler;
 }
 
 void print_help(struct Command *cmd) {
-	printf("Help... coming soon");
+	printf("Help for %s... coming soon", cmd->name);
+}
+
+void free_command(struct Command *cmd) {
+	struct Arg *cur_arg = cmd->args;
+	struct Arg *next_arg;
+
+	while (cur_arg != NULL) {
+		next_arg = cur_arg->next;
+		free(cur_arg);
+		cur_arg = next_arg;
+	}
+
+	struct Opt *cur_opt = cmd->opts;
+	struct Opt *next_opt;
+
+	while (cur_opt != NULL) {
+		next_opt = cur_opt->next;
+		free(cur_opt);
+		cur_opt = next_opt;
+	}
+
+	struct Flag *cur_flg = cmd->flags;
+	struct Flag *next_flg;
+
+	while (cur_flg != NULL) {
+		next_flg = cur_flg->next;
+		free(cur_flg);
+		cur_flg = next_flg;
+	}
+
+	free(cmd);
 }

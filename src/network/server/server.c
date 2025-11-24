@@ -12,6 +12,8 @@
 #include "../network_utils.h"
 #include "../../utils/daemonize.h"
 
+#define MAX_CLIENTS 100
+
 static struct sockaddr_storage their_addr;
 static int sockfd;
 
@@ -50,7 +52,17 @@ void server_loop(void) {
 
 }
 
-void start_server(char *port, int max_clients) {
+void start_server(struct ParseSubcommandResult *res) {
+	puts("I'm here");
+	char *port = get_opt_value(res, 'p');
+	char *tmp = get_opt_value(res, 'm');
+
+	int num_clients = atoi(tmp);
+	if (num_clients <= 0 || num_clients > MAX_CLIENTS) {
+		printf("-c requires a number between 1 and %d\n", MAX_CLIENTS);
+		return;
+	}
+
 	int sockfd, rv, yes = 1;
 	struct addrinfo hints, *servinfo, *p;
 
@@ -75,6 +87,7 @@ void start_server(char *port, int max_clients) {
 			continue;
 		}
 
+
 		break;
 	}
 
@@ -85,7 +98,7 @@ void start_server(char *port, int max_clients) {
 		return;
 	}
 
-	if (listen(sockfd, max_clients) == -1) {
+	if (listen(sockfd, num_clients) == -1) {
 		fprintf(stderr, "Server failed to listen\n");
 		return;
 	}
